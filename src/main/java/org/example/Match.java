@@ -1,6 +1,7 @@
 package org.example;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class Match implements IMatch {
     private final ITeam homeTeam;
@@ -15,6 +16,14 @@ public class Match implements IMatch {
         this.homeScore = 0;
         this.awayScore = 0;
         this.startTime = Instant.now();
+    }
+
+    public Match(ITeam homeTeam, ITeam awayTeam, Instant startTime) {
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.homeScore = 0;
+        this.awayScore = 0;
+        this.startTime = startTime;
     }
 
     public ITeam getHomeTeam() {
@@ -49,5 +58,19 @@ public class Match implements IMatch {
     @Override
     public String toString() {
         return homeTeam + " " + homeScore + " - " + awayTeam + " " + awayScore;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Match match = (Match) o;
+        return homeScore == match.homeScore && awayScore == match.awayScore && Objects.equals(homeTeam, match.homeTeam)
+                && Objects.equals(awayTeam, match.awayTeam) && Objects.equals(startTime, match.startTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(homeTeam, awayTeam, homeScore, awayScore, startTime);
     }
 }
