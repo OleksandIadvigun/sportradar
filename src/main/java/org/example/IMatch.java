@@ -15,5 +15,6 @@ public interface IMatch {
     Instant getStartTime();
 
     void updateScore(int homeScore, int awayScore);
+
     int getTotalScore();
 }

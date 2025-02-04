@@ -17,7 +17,7 @@ public class MatchTest {
     }
 
     @Test
-    public void testConstructor() {
+    public void constructor() {
         // Given
         ITeam expectedHomeTeam = new Team("Team A");
         ITeam expectedAwayTeam = new Team("Team B");
@@ -37,7 +37,27 @@ public class MatchTest {
     }
 
     @Test
-    public void testUpdateScore() {
+    public void constructorWithStartTime() {
+        // Given
+        ITeam expectedHomeTeam = new Team("Team A");
+        ITeam expectedAwayTeam = new Team("Team B");
+        int expectedHomeScore = 0;
+        int expectedAwayScore = 0;
+        Instant expectedStartTime = Instant.now();
+
+        // When
+        Match match = new Match(expectedHomeTeam, expectedAwayTeam, expectedStartTime);
+
+        // Then
+        assertEquals(expectedHomeTeam, match.getHomeTeam());
+        assertEquals(expectedAwayTeam, match.getAwayTeam());
+        assertEquals(expectedHomeScore, match.getHomeScore());
+        assertEquals(expectedAwayScore, match.getAwayScore());
+        assertEquals(expectedStartTime.getEpochSecond(), match.getStartTime().getEpochSecond());
+    }
+
+    @Test
+    public void updateScore() {
         // Given
         int newHomeScore = 3;
         int newAwayScore = 2;
@@ -51,7 +71,7 @@ public class MatchTest {
     }
 
     @Test
-    public void testGetTotalScore() {
+    public void getTotalScore() {
         // Given
         int newHomeScore = 3;
         int newAwayScore = 2;

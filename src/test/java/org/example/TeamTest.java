@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TeamTest {
 
     @Test
-    public void testConstructorAndGetName() {
+    public void constructorAndGetName() {
         // Given
         String expectedName = "Team A";
 
