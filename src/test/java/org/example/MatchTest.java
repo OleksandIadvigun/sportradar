@@ -1,49 +1,36 @@
 package org.example;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MatchTest {
 
     private Match match;
+    private String homeTeam;
+    private String awayTeam;
+    private AtomicInteger startTime;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        match = new Match(new Team("Team A"), new Team("Team B"));
+        homeTeam = "Team A";
+        awayTeam = "Team B";
+        startTime = new AtomicInteger((int) Instant.now().getEpochSecond());
+        match = new Match(homeTeam, awayTeam, startTime);
     }
 
     @Test
     public void constructor() {
         // Given
-        ITeam expectedHomeTeam = new Team("Team A");
-        ITeam expectedAwayTeam = new Team("Team B");
+        String expectedHomeTeam = "Team A";
+        String expectedAwayTeam = "Team B";
         int expectedHomeScore = 0;
         int expectedAwayScore = 0;
-        long expectedStartTime = Instant.now().getEpochSecond();
-
-        // When
-        Match match = new Match(expectedHomeTeam, expectedAwayTeam);
-
-        // Then
-        assertEquals(expectedHomeTeam, match.getHomeTeam());
-        assertEquals(expectedAwayTeam, match.getAwayTeam());
-        assertEquals(expectedHomeScore, match.getHomeScore());
-        assertEquals(expectedAwayScore, match.getAwayScore());
-        assertEquals(expectedStartTime, match.getStartTime().getEpochSecond(), 1);
-    }
-
-    @Test
-    public void constructorWithStartTime() {
-        // Given
-        ITeam expectedHomeTeam = new Team("Team A");
-        ITeam expectedAwayTeam = new Team("Team B");
-        int expectedHomeScore = 0;
-        int expectedAwayScore = 0;
-        Instant expectedStartTime = Instant.now();
+        AtomicInteger expectedStartTime = startTime;
 
         // When
         Match match = new Match(expectedHomeTeam, expectedAwayTeam, expectedStartTime);
@@ -53,48 +40,126 @@ public class MatchTest {
         assertEquals(expectedAwayTeam, match.getAwayTeam());
         assertEquals(expectedHomeScore, match.getHomeScore());
         assertEquals(expectedAwayScore, match.getAwayScore());
-        assertEquals(expectedStartTime.getEpochSecond(), match.getStartTime().getEpochSecond());
+        assertEquals(expectedStartTime, match.getStartTime());
     }
 
     @Test
-    public void updateScore() {
+    public void getHomeTeam() {
         // Given
-        int newHomeScore = 3;
-        int newAwayScore = 2;
+        String expectedHomeTeam = "Team A";
 
         // When
-        match.updateScore(newHomeScore, newAwayScore);
+        String actualHomeTeam = match.getHomeTeam();
+
+        // Then
+        assertEquals(expectedHomeTeam, actualHomeTeam);
+    }
+
+    @Test
+    public void getAwayTeam() {
+        // Given
+        String expectedAwayTeam = "Team B";
+
+        // When
+        String actualAwayTeam = match.getAwayTeam();
+
+        // Then
+        assertEquals(expectedAwayTeam, actualAwayTeam);
+    }
+
+    @Test
+    public void getHomeScore() {
+        // Given
+        int expectedHomeScore = 0;
+
+        // When
+        int actualHomeScore = match.getHomeScore();
+
+        // Then
+        assertEquals(expectedHomeScore, actualHomeScore);
+    }
+
+    @Test
+    public void getAwayScore() {
+        // Given
+        int expectedAwayScore = 0;
+
+        // When
+        int actualAwayScore = match.getAwayScore();
+
+        // Then
+        assertEquals(expectedAwayScore, actualAwayScore);
+    }
+
+    @Test
+    public void getStartTime() {
+        // Given
+        AtomicInteger expectedStartTime = startTime;
+
+        // When
+        AtomicInteger actualStartTime = match.getStartTime();
+
+        // Then
+        assertEquals(expectedStartTime, actualStartTime);
+    }
+
+    @Test
+    public void setHomeScore() {
+        // Given
+        int newHomeScore = 3;
+
+        // When
+        match.setHomeScore(newHomeScore);
 
         // Then
         assertEquals(newHomeScore, match.getHomeScore());
+    }
+
+    @Test
+    public void setAwayScore() {
+        // Given
+        int newAwayScore = 2;
+
+        // When
+        match.setAwayScore(newAwayScore);
+
+        // Then
         assertEquals(newAwayScore, match.getAwayScore());
     }
 
     @Test
-    public void getTotalScore() {
+    public void toStringTest() {
         // Given
         int newHomeScore = 3;
         int newAwayScore = 2;
-        match.updateScore(newHomeScore, newAwayScore);
+        match.setHomeScore(newHomeScore);
+        match.setAwayScore(newAwayScore);
+        String expectedString = "Team A 3 - Team B 2";
 
         // When
-        int totalScore = match.getTotalScore();
+        String actualString = match.toString();
 
         // Then
-        assertEquals(5, totalScore);
+        assertEquals(expectedString, actualString);
     }
 
     @Test
-    public void testToString() {
+    public void equalsTest() {
         // Given
-        int newHomeScore = 3;
-        int newAwayScore = 2;
-        match.updateScore(newHomeScore, newAwayScore);
+        Match match1 = new Match(homeTeam, awayTeam, startTime);
+        Match match2 = new Match(homeTeam, awayTeam, startTime);
 
-        // When
-        String result = match.toString();
+        // When & Then
+        assertEquals(match1, match2);
+    }
 
-        // Then
-        assertEquals("Team A 3 - Team B 2", result);
+    @Test
+    public void hashCodeTest() {
+        // Given
+        Match match1 = new Match(homeTeam, awayTeam, startTime);
+        Match match2 = new Match(homeTeam, awayTeam, startTime);
+
+        // When & Then
+        assertEquals(match1.hashCode(), match2.hashCode());
     }
 }
