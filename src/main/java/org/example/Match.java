@@ -2,23 +2,16 @@ package org.example;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class Match implements IMatch {
-    private final ITeam homeTeam;
-    private final ITeam awayTeam;
+public class Match{
+    private final String homeTeam;
+    private final String awayTeam;
     private int homeScore;
     private int awayScore;
-    private final Instant startTime;
+    private final AtomicInteger startTime;
 
-    public Match(ITeam homeTeam, ITeam awayTeam) {
-        this.homeTeam = homeTeam;
-        this.awayTeam = awayTeam;
-        this.homeScore = 0;
-        this.awayScore = 0;
-        this.startTime = Instant.now();
-    }
-
-    public Match(ITeam homeTeam, ITeam awayTeam, Instant startTime) {
+    public Match(String homeTeam, String awayTeam, AtomicInteger startTime) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.homeScore = 0;
@@ -26,11 +19,11 @@ public class Match implements IMatch {
         this.startTime = startTime;
     }
 
-    public ITeam getHomeTeam() {
+    public String getHomeTeam() {
         return homeTeam;
     }
 
-    public ITeam getAwayTeam() {
+    public String getAwayTeam() {
         return awayTeam;
     }
 
@@ -42,17 +35,16 @@ public class Match implements IMatch {
         return awayScore;
     }
 
-    public Instant getStartTime() {
+    public AtomicInteger getStartTime() {
         return startTime;
     }
 
-    public void updateScore(int homeScore, int awayScore) {
+    public void setHomeScore(int homeScore) {
         this.homeScore = homeScore;
-        this.awayScore = awayScore;
     }
 
-    public int getTotalScore() {
-        return homeScore + awayScore;
+    public void setAwayScore(int awayScore) {
+        this.awayScore = awayScore;
     }
 
     @Override

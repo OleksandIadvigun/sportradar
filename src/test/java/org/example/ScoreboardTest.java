@@ -1,34 +1,65 @@
 package org.example;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
-
 public class ScoreboardTest {
+
+    private Scoreboard scoreboard;
+
+    @BeforeEach
+    public void setUp() {
+        scoreboard = new Scoreboard();
+    }
 
     @Test
     public void startMatch() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
+        String homeTeam = "Team A";
+        String awayTeam = "Team B";
+        Instant startTime = Instant.now();
 
         // When
-        scoreboard.startMatch(new Team("Mexico"), new Team("Canada"));
+        scoreboard.startMatch(homeTeam, awayTeam, startTime);
 
         // Then
         List<String> summary = scoreboard.getSummary();
         assertEquals(1, summary.size());
-        assertEquals("Mexico 0 - Canada 0", summary.get(0));
+        assertEquals("Team A 0 - Team B 0", summary.get(0));
     }
 
     @Test
     public void startMatchWithSameTeamsThrowsException() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
+        String homeTeam = "Team A";
+        String awayTeam = "Team A";
+        Instant startTime = Instant.now();
 
         // When
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            scoreboard.startMatch(new Team("Mexico"), new Team("Mexico"));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            scoreboard.startMatch(homeTeam, awayTeam, startTime);
+        });
+
+        // Then
+        assertEquals("Home team and away team cannot be the same.", exception.getMessage());
+    }
+
+    @Test
+    public void startMatchWithEmptyTeamNameThrowsException() {
+        // Given
+        String homeTeam = "";
+        String awayTeam = "Team B";
+        Instant startTime = Instant.now();
+
+        // When
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            scoreboard.startMatch(homeTeam, awayTeam, startTime);
         });
 
         // Then
@@ -38,26 +69,30 @@ public class ScoreboardTest {
     @Test
     public void updateScore() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
-        scoreboard.startMatch(new Team("Mexico"), new Team("Canada"));
+        String homeTeam = "Team A";
+        String awayTeam = "Team B";
+        Instant startTime = Instant.now();
+        scoreboard.startMatch(homeTeam, awayTeam, startTime);
 
         // When
-        scoreboard.updateScore(new Team("Mexico"), new Team("Canada"), 0, 5);
+        scoreboard.updateScore(homeTeam, awayTeam, 3, 2);
 
         // Then
         List<String> summary = scoreboard.getSummary();
-        assertEquals("Mexico 0 - Canada 5", summary.get(0));
+        assertEquals("Team A 3 - Team B 2", summary.get(0));
     }
 
     @Test
     public void updateScoreWithNegativeValuesThrowsException() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
-        scoreboard.startMatch(new Team("Mexico"), new Team("Canada"));
+        String homeTeam = "Team A";
+        String awayTeam = "Team B";
+        Instant startTime = Instant.now();
+        scoreboard.startMatch(homeTeam, awayTeam, startTime);
 
         // When
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            scoreboard.updateScore(new Team("Mexico"), new Team("Canada"), -1, 5);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            scoreboard.updateScore(homeTeam, awayTeam, -1, 2);
         });
 
         // Then
@@ -67,11 +102,12 @@ public class ScoreboardTest {
     @Test
     public void updateScoreForNonExistingMatchThrowsException() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
+        String homeTeam = "Team A";
+        String awayTeam = "Team B";
 
         // When
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            scoreboard.updateScore(new Team("Mexico"), new Team("Canada"), 0, 5);
+            scoreboard.updateScore(homeTeam, awayTeam, 3, 2);
         });
 
         // Then
@@ -81,11 +117,13 @@ public class ScoreboardTest {
     @Test
     public void finishMatch() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
-        scoreboard.startMatch(new Team("Mexico"), new Team("Canada"));
+        String homeTeam = "Team A";
+        String awayTeam = "Team B";
+        Instant startTime = Instant.now();
+        scoreboard.startMatch(homeTeam, awayTeam, startTime);
 
         // When
-        scoreboard.finishMatch(new Team("Mexico"), new Team("Canada"));
+        scoreboard.finishMatch(homeTeam, awayTeam);
 
         // Then
         List<String> summary = scoreboard.getSummary();
@@ -95,11 +133,12 @@ public class ScoreboardTest {
     @Test
     public void finishNonExistingMatchThrowsException() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
+        String homeTeam = "Team A";
+        String awayTeam = "Team B";
 
         // When
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            scoreboard.finishMatch(new Team("Mexico"), new Team("Canada"));
+        Exception exception = assertThrows(NoSuchElementException.class, () -> {
+            scoreboard.finishMatch(homeTeam, awayTeam);
         });
 
         // Then
@@ -107,29 +146,26 @@ public class ScoreboardTest {
     }
 
     @Test
-    public void getSummaryShouldBeSuccessfulAndOrderedByTotalScore() {
+    public void getSummaryShouldBeOrderedByTotalScoreAndStartTime() {
         // Given
-        IScoreboard scoreboard = new Scoreboard();
-        scoreboard.startMatch(new Team("Mexico"), new Team("Canada"));
-        scoreboard.updateScore(new Team("Mexico"), new Team("Canada"), 0, 5);
-        scoreboard.startMatch(new Team("Spain"), new Team("Brazil"));
-        scoreboard.updateScore(new Team("Spain"), new Team("Brazil"), 10, 2);
-        scoreboard.startMatch(new Team("Germany"), new Team("France"));
-        scoreboard.updateScore(new Team("Germany"), new Team("France"), 2, 2);
-        scoreboard.startMatch(new Team("Uruguay"), new Team("Italy"));
-        scoreboard.updateScore(new Team("Uruguay"), new Team("Italy"), 6, 6);
-        scoreboard.startMatch(new Team("Argentina"), new Team("Australia"));
-        scoreboard.updateScore(new Team("Argentina"), new Team("Australia"), 3, 1);
+        Instant now = Instant.now();
+        scoreboard.startMatch("Team A", "Team B", now);
+        scoreboard.updateScore("Team A", "Team B", 1, 2); // Total score: 3
+        scoreboard.startMatch("Team C", "Team D", now.plusSeconds(10));
+        scoreboard.updateScore("Team C", "Team D", 3, 3); // Total score: 6
+        scoreboard.startMatch("Team E", "Team F", now.plusSeconds(20));
+        scoreboard.updateScore("Team E", "Team F", 0, 1); // Total score: 1
+        scoreboard.startMatch("Team G", "Team H", now.plusSeconds(30));
+        scoreboard.updateScore("Team G", "Team H", 1, 2); // Total score: 3, later start time
 
         // When
         List<String> summary = scoreboard.getSummary();
 
         // Then
-        assertEquals(5, summary.size());
-        assertEquals("Uruguay 6 - Italy 6", summary.get(0));
-        assertEquals("Spain 10 - Brazil 2", summary.get(1));
-        assertEquals("Mexico 0 - Canada 5", summary.get(2));
-        assertEquals("Argentina 3 - Australia 1", summary.get(3));
-        assertEquals("Germany 2 - France 2", summary.get(4));
+        assertEquals(4, summary.size());
+        assertEquals("Team C 3 - Team D 3", summary.get(0)); // Highest total score
+        assertEquals("Team A 1 - Team B 2", summary.get(1)); // Same total score, earlier start time
+        assertEquals("Team G 1 - Team H 2", summary.get(2)); // Same total score, later start time
+        assertEquals("Team E 0 - Team F 1", summary.get(3)); // Lowest total score
     }
 }
