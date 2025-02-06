@@ -9,9 +9,9 @@ public class Match{
     private final String awayTeam;
     private int homeScore;
     private int awayScore;
-    private final AtomicInteger startTime;
+    private final Instant startTime;
 
-    public Match(String homeTeam, String awayTeam, AtomicInteger startTime) {
+    public Match(String homeTeam, String awayTeam, Instant startTime) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.homeScore = 0;
@@ -35,7 +35,7 @@ public class Match{
         return awayScore;
     }
 
-    public AtomicInteger getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
