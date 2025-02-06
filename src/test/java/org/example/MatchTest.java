@@ -4,22 +4,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MatchTest {
 
     private Match match;
     private String homeTeam;
     private String awayTeam;
-    private AtomicInteger startTime;
+    private Instant startTime;
 
     @BeforeEach
     public void setUp() {
         homeTeam = "Team A";
         awayTeam = "Team B";
-        startTime = new AtomicInteger((int) Instant.now().getEpochSecond());
+        startTime = Instant.now();
         match = new Match(homeTeam, awayTeam, startTime);
     }
 
@@ -30,7 +29,7 @@ public class MatchTest {
         String expectedAwayTeam = "Team B";
         int expectedHomeScore = 0;
         int expectedAwayScore = 0;
-        AtomicInteger expectedStartTime = startTime;
+        Instant expectedStartTime = startTime;
 
         // When
         Match match = new Match(expectedHomeTeam, expectedAwayTeam, expectedStartTime);
@@ -94,10 +93,10 @@ public class MatchTest {
     @Test
     public void getStartTime() {
         // Given
-        AtomicInteger expectedStartTime = startTime;
+        Instant expectedStartTime = startTime;
 
         // When
-        AtomicInteger actualStartTime = match.getStartTime();
+        Instant actualStartTime = match.getStartTime();
 
         // Then
         assertEquals(expectedStartTime, actualStartTime);

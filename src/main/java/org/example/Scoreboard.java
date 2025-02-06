@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Scoreboard {
@@ -19,7 +18,7 @@ public class Scoreboard {
             throw new IllegalArgumentException("Home team and away team cannot be the same.");
         }
         String key = generateKey(homeTeam, awayTeam);
-        matches.put(key, new Match(homeTeam, awayTeam, new AtomicInteger((int)startTime.getEpochSecond())));
+        matches.put(key, new Match(homeTeam, awayTeam, startTime));
     }
 
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
@@ -29,7 +28,7 @@ public class Scoreboard {
         String key = generateKey(homeTeam, awayTeam);
         Match match = matches.get(key);
         if (match == null) {
-            throw new RuntimeException("Match not found.");
+            throw new NoSuchElementException("Match not found.");
         }
         updateScore(match, homeScore, awayScore);
     }
@@ -51,7 +50,7 @@ public class Scoreboard {
                     if (scoreComparison != 0) {
                         return scoreComparison;
                     }
-                    return Integer.compare(m1.getStartTime().get(), m2.getStartTime().get());
+                    return Long.compare(m1.getStartTime().getEpochSecond(), m2.getStartTime().getEpochSecond());
                 })
                 .map(Match::toString)
                 .collect(Collectors.toList());
